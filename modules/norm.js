@@ -9,6 +9,8 @@ let Norm = mongoose.model('Norm', NormSchema); // 编译生成Movie 模型
 module.exports = {
 	findAll: function(req, res, next) {
 		Norm.find()
+			.populate('industryIds', '_id name')
+			.populate('themeIds', '_id name')
 			.sort({
 				_id: -1
 			}) //排序
@@ -127,6 +129,64 @@ module.exports = {
 			}
 		})
     },
+	modifyData:function(req, res, next){//修改name: id:id,img:img
+		let themeList=req.body.themeList?req.body.themeList:[],
+    		industryList=req.body.industryList?req.body.industryList:[];
+		let qdata = {
+			title: req.body.title,
+			id:req.body.id,
+			img:req.body.img,
+			content:req.body.content,
+			industryIds:[],
+    		themeIds:[]
+		};//post 是req.body
+
+		if(!qdata.title){
+			return res.status(200).json({
+				result: null,
+				msg: '名称不能为空',
+				code: 1
+			});
+		}
+		if(!qdata.id){
+			return res.status(200).json({
+				result: null,
+				msg: '保存失败，没有该类别',
+				code: 1
+			});
+		}
+
+		if(themeList.length>0){
+			for(var i=0,len=themeList.length;i<len;i++){
+				if(themeList[i] && themeList[i]!='0')
+				qdata.themeIds.push(mongoose.Types.ObjectId(themeList[i]));
+			}
+		}
+		if(industryList.length>0){
+			for(var i=0,len=industryList.length;i<len;i++){
+				if(industryList[i] && industryList[i]!='0')
+				qdata.industryIds.push(mongoose.Types.ObjectId(industryList[i]));
+			}
+		}
+		
+		Norm.findOne({_id:qdata.id}, function(err, result) {
+			if(err) {
+				return next(err);
+			}
+			let oldValue  = {_id:qdata.id};
+			let newData = {'$set':qdata};
+			Norm.update(oldValue,newData,function(err,res1){
+				if(err) {
+					return next(err);
+				}
+				return res.status(200).json({
+					result: null,
+					msg: '保存成功',
+					code: 0
+				});
+			})
+		})
+	},
 	search: function(req, res, next) {
 		let val = req.query.value;
 		Norm.find()

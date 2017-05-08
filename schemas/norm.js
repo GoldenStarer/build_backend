@@ -19,14 +19,6 @@ var NormSchema = new mongoose.Schema({
 		type: String,
 		default: ''
 	},//规范编号
-	industryId : {
-		type: Schema.ObjectId,
-		ref: 'Industry'
-	},//行业id
-	themeId : {
-		type: Schema.ObjectId,
-		ref: 'Theme'
-	},//类别id
 	industryIds : [{
 		type: Schema.ObjectId,
 		ref: 'Industry'
