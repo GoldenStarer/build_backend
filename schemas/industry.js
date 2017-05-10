@@ -4,11 +4,6 @@ let Schema = mongoose.Schema;
 
 //申明一个mongoons对象
 var IndustrySchema = new mongoose.Schema({
-	id: {
-		type: String,
-		default: String(new Date().getTime()),
-		unique: true
-	},
 	name: {
 		type: String,
 		default: '',
@@ -48,7 +43,6 @@ IndustrySchema.pre('save', function(next) {
 	console.log('一次save');
 	if(this.isNew) {
 		this.meta.createAt = this.meta.updateAt = Date.now();
-		this.id = String(new Date().getTime());
 	} else {
 		this.meta.updateAt = Date.now();
 	}
